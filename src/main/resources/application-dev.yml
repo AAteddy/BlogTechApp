@@ -1,0 +1,34 @@
+
+spring:
+  application:
+    name: blog-application
+
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/blog_db
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  security:
+    jwt:
+      secret: secret_key
+      expiration: 3600000
+
+  cache:
+    type: redis
+  redis:
+    host: localhost
+    port: 6379
+
+logging:
+  level:
+    org:
+      springframework: INFO
+    com:
+      tedsaasfaha: DEBUG
