@@ -1,3 +1,4 @@
+
 package com.tedsaasfaha.blogapplication.repository;
 
 import com.tedsaasfaha.blogapplication.entity.Post;
@@ -15,3 +16,4 @@ public interface PostRepo extends JpaRepository<Post, Long> {
 
     Page<Post> findByAuthorAndStatus(User author, PostStatus status, Pageable pageable);
 }
+//

@@ -41,7 +41,8 @@ public class AuthenticationController {
         user.setEmail(registrationDTO.getEmail());
         user.setPassword(registrationDTO.getPassword());
         user.setRole(registrationDTO.getRole() != null ?
-                registrationDTO.getRole() : Role.READER); // default role is USER
+                Role.valueOf(registrationDTO.getRole().toUpperCase()) :
+                Role.READER); // default role is READER
 
         userService.registerUser(user);
         return new ResponseEntity<>(

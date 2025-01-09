@@ -1,3 +1,4 @@
+
 package com.tedsaasfaha.blogapplication.entity;
 
 import jakarta.persistence.*;
@@ -26,9 +27,10 @@ public class Post {
 
     private LocalDateTime updatedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "author_id",
             nullable = false)
     private User author;
 }
+//

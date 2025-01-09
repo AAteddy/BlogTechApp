@@ -1,5 +1,8 @@
+
 package com.tedsaasfaha.blogapplication.service;
 
+import com.tedsaasfaha.blogapplication.dto.PostCreationRequestDTO;
+import com.tedsaasfaha.blogapplication.dto.PostResponseDTO;
 import com.tedsaasfaha.blogapplication.entity.Post;
 import com.tedsaasfaha.blogapplication.entity.User;
 import org.springframework.data.domain.Page;
@@ -7,7 +10,8 @@ import org.springframework.data.domain.Pageable;
 
 public interface PostService {
 
-    Post createPost(Post post);
+    PostResponseDTO createPost(PostCreationRequestDTO postCreationRequestDTO,
+                               CustomUserPrinciple customUserPrinciple);
 
     Page<Post> getAllPublishedPosts(Pageable pageable);
 
@@ -19,3 +23,4 @@ public interface PostService {
 
     void deletePost(Long postId, User currentUser);
 }
+//
