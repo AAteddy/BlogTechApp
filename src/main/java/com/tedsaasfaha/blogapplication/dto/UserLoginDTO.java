@@ -1,3 +1,4 @@
+
 package com.tedsaasfaha.blogapplication.dto;
 
 import jakarta.validation.constraints.Email;
@@ -14,3 +15,4 @@ public class UserLoginDTO {
     @NotBlank(message = "Password is required")
     private String password;
 }
+//

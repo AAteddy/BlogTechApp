@@ -1,3 +1,4 @@
+
 package com.tedsaasfaha.blogapplication.entity;
 
 
@@ -33,3 +34,4 @@ public class User {
     @Column(nullable = false)
     private Role role;
 }
+//
