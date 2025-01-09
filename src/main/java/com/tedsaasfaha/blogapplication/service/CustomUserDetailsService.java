@@ -6,17 +6,16 @@ import com.tedsaasfaha.blogapplication.entity.User;
 import com.tedsaasfaha.blogapplication.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class CustomUserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
 
     private final UserRepo userRepo;
 
-    @Autowired
+//    @Autowired
     public CustomUserDetailsService(UserRepo userRepo) {
         this.userRepo = userRepo;
     }
@@ -28,12 +27,13 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "User not found with username : " + username));
 
-        return org.springframework.security.core.userdetails.User
-                .builder()
-                .username(user.getEmail())
-                .password(user.getPassword())
-                .roles(user.getRole().name())
-                .build();
+        return new CustomUserPrinciple(user);
+//        return org.springframework.security.core.userdetails.User
+//                .builder()
+//                .username(user.getEmail())
+//                .password(user.getPassword())
+//                .roles(user.getRole().name())
+//                .build();
     }
 }
 //

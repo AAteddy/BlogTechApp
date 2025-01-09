@@ -2,7 +2,6 @@
 package com.tedsaasfaha.blogapplication.dto;
 
 
-import com.tedsaasfaha.blogapplication.entity.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -23,6 +22,6 @@ public class UserRegistrationDTO {
     private String password;
 
     @NotBlank(message = "Role is required")
-    private Role role;
+    private String role;
 }
 //
