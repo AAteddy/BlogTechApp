@@ -37,7 +37,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
 
         try {
@@ -51,7 +53,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     if (jwtUtil.validateToken(jwt, userDetails)) {
                         UsernamePasswordAuthenticationToken authToken =
-                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetails,
+                                        null,
+                                        userDetails.getAuthorities());
                         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                     }
@@ -60,17 +65,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         } catch (io.jsonwebtoken.MalformedJwtException | io.jsonwebtoken.SignatureException e) {
-            logger.error("Invalid JWT token: {}");
+            logger.error("Invalid JWT token: {}", e.getCause());
             setErrorResponse(response, HttpStatus.UNAUTHORIZED, "Invalid JWT token");
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            logger.error("Expired JWT token: {}");
+            logger.error("Expired JWT token: {}", e.getCause());
             setErrorResponse(response, HttpStatus.UNAUTHORIZED, "Expired JWT token");
         } catch (Exception e) {
-            setErrorResponse(response, HttpStatus.UNAUTHORIZED, "An error occurred while processing the JWT token");
+            setErrorResponse(
+                    response,
+                    HttpStatus.UNAUTHORIZED,
+                    "An error occurred while processing the JWT token");
         }
     }
 
-    private void setErrorResponse(HttpServletResponse response, HttpStatus status, String message) throws IOException {
+    private void setErrorResponse(
+            HttpServletResponse response,
+            HttpStatus status,
+            String message) throws IOException {
         response.setStatus(status.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 

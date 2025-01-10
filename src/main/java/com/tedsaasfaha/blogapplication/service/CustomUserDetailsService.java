@@ -4,7 +4,6 @@ package com.tedsaasfaha.blogapplication.service;
 
 import com.tedsaasfaha.blogapplication.entity.User;
 import com.tedsaasfaha.blogapplication.repository.UserRepo;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,7 @@ public class CustomUserDetailsService implements org.springframework.security.co
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepo.findByEmail(username)
-                .orElseThrow(() -> new BadCredentialsException(
+                .orElseThrow(() -> new UsernameNotFoundException(
                         "User not found with username : " + username));
 
         return new CustomUserPrinciple(user);
