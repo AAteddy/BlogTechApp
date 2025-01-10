@@ -10,10 +10,8 @@ import com.tedsaasfaha.blogapplication.entity.Role;
 import com.tedsaasfaha.blogapplication.entity.User;
 import com.tedsaasfaha.blogapplication.exception.PostNotFoundException;
 import com.tedsaasfaha.blogapplication.repository.PostRepo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,7 +24,6 @@ public class PostServiceImpl implements PostService {
     public PostServiceImpl(PostRepo postRepo) {
         this.postRepo = postRepo;
     }
-
 
     @Override
     public PostResponseDTO createPost(PostCreationRequestDTO postCreationRequestDTO,

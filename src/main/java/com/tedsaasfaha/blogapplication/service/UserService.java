@@ -30,7 +30,8 @@ public class UserService {
         return userRepo.findByEmail(email).orElse(null);
     }
 
-    public boolean validatePassword(String rawPassword, String encodePassword) {
+    public boolean validatePassword(String rawPassword,
+                                    String encodePassword) {
         return passwordEncoder.matches(rawPassword,encodePassword);
     }
 }
