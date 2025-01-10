@@ -9,6 +9,7 @@ import com.tedsaasfaha.blogapplication.entity.User;
 import com.tedsaasfaha.blogapplication.service.CustomUserPrinciple;
 import com.tedsaasfaha.blogapplication.service.PostService;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,7 +31,7 @@ public class PostController {
 
     @PostMapping()
     public ResponseEntity<PostResponseDTO> createPost(
-            @RequestBody PostCreationRequestDTO postCreationRequestDTO,
+            @Valid @RequestBody PostCreationRequestDTO postCreationRequestDTO,
             @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
 
         if (customUserPrinciple == null) {

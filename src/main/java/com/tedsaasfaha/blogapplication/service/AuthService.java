@@ -8,6 +8,7 @@ import com.tedsaasfaha.blogapplication.entity.User;
 import com.tedsaasfaha.blogapplication.repository.UserRepo;
 import com.tedsaasfaha.blogapplication.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,13 +24,15 @@ public class AuthService {
     @Autowired
     private JwtUtil jwtUtil;
 
+//    public class AuthService() {}
+
 
     public TokenDTO login(UserLoginDTO loginDTO) {
         User user = userRepo.findByEmail(loginDTO.getEmail())
-                .orElseThrow(() -> new RuntimeException("Invalid email or password"));
+                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
 
         if(!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid email or password");
+            throw new BadCredentialsException("Invalid email or password");
         }
 
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
