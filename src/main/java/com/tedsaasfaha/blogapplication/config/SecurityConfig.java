@@ -2,6 +2,7 @@
 package com.tedsaasfaha.blogapplication.config;
 
 
+import com.tedsaasfaha.blogapplication.exception.CustomAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,9 +22,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+                          CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
     }
 
     @Bean
@@ -35,12 +39,15 @@ public class SecurityConfig {
                         .requestMatchers("/api/writer/**").hasRole("WRITER")
                         .requestMatchers("/api/reader/**").hasAnyRole("READER", "WRITER", "ADMIN")
                         .anyRequest().authenticated())
+                .exceptionHandling(exception -> exception
+                .authenticationEntryPoint(customAuthenticationEntryPoint)) // Set custom entry point
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS))
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 

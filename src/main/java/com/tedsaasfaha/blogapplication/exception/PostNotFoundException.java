@@ -1,3 +1,4 @@
+
 package com.tedsaasfaha.blogapplication.exception;
 
 
@@ -6,3 +7,4 @@ public class PostNotFoundException extends RuntimeException {
         super(message);
     }
 }
+//
