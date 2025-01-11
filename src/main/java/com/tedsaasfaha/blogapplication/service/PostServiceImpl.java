@@ -55,19 +55,24 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Page<Post> getPostByAuthor(User author, Pageable pageable) {
-        return postRepo.findByAuthor(author, pageable);
+    public Page<PostResponseDTO> getPostByAuthor(User author, Pageable pageable) {
+        Page<Post> posts = postRepo.findByAuthor(author, pageable);
+
+        return posts.map(this::mapToPostResponseDTO);
     }
 
     @Override
-    public Post getPostById(Long postId) {
-        return postRepo.findById(postId)
+    public PostResponseDTO getPostById(Long postId) {
+        Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("Post not found"));
+
+        return mapToPostResponseDTO(post);
     }
 
     @Override
-    public Post updatePost(Long postId, Post updatedPost, User currentUser) {
-        Post post = getPostById(postId);
+    public PostResponseDTO updatePost(Long postId, Post updatedPost, User currentUser) {
+        Post post = postRepo.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Post not found"));
 
         // Only allow update if the user is the author or has admin role
         if (!post.getAuthor().equals(currentUser) &&
@@ -77,16 +82,19 @@ public class PostServiceImpl implements PostService {
 
         post.setTitle(updatedPost.getTitle());
         post.setContent(updatedPost.getContent());
-        post.setStatus(updatedPost.getStatus());
+        post.setStatus(PostStatus.PUBLISHED);
+        post.setCreatedAt(post.getCreatedAt());
         post.setUpdatedAt(LocalDateTime.now());
 
-        return postRepo.save(post);
+        Post postResponse = postRepo.save(post);
+
+        return mapToPostResponseDTO(postResponse);
     }
 
     @Override
     public void deletePost(Long postId, User currentUser) {
-
-        Post post = getPostById(postId);
+        Post post = postRepo.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Post not found"));
 
         // Only allow to delete if the user is the author or has admin role
         if (!post.getAuthor().equals(currentUser) &&
@@ -116,6 +124,15 @@ public class PostServiceImpl implements PostService {
 
         return responseDTO;
     }
+
+//    private Post mapToPost(PostResponseDTO postDTO) {
+//        Post post = new Post();
+//        post.setTitle(postDTO.getTitle());
+//        post.setContent(postDTO.getContent());
+//        post.setUpdatedAt(LocalDateTime.now());
+//
+//        return post;
+//    }
 
 }
 //

@@ -52,41 +52,41 @@ public class PostController {
     }
 
     @GetMapping("/author")
-    public ResponseEntity<Page<Post>> getPostsByAuthor(
+    public ResponseEntity<Page<PostResponseDTO>> getPostsByAuthor(
             @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple,
             Pageable pageable) {
 
         if (customUserPrinciple == null) {
-            throw new IllegalStateException("No authenticated user found.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
         User currentUser = customUserPrinciple.getUser();
-        Page<Post> posts = postService.getPostByAuthor(currentUser, pageable);
+        Page<PostResponseDTO> posts = postService.getPostByAuthor(currentUser, pageable);
 
         return ResponseEntity.ok(posts);
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<Post> getPostById(
+    public ResponseEntity<PostResponseDTO> getPostById(
             @PathVariable Long postId) {
 
-        Post post = postService.getPostById(postId);
+        PostResponseDTO post = postService.getPostById(postId);
 
         return ResponseEntity.ok(post);
     }
 
     @PutMapping("/{postId}")
-    public ResponseEntity<Post> updatePost(
+    public ResponseEntity<PostResponseDTO> updatePost(
             @PathVariable Long postId,
             @RequestBody Post updatedPost,
             @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
 
         if (customUserPrinciple == null) {
-            throw new IllegalStateException("No authenticated user found.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
         User currentUser = customUserPrinciple.getUser();
-        Post post = postService.updatePost(postId, updatedPost, currentUser);
+        PostResponseDTO post = postService.updatePost(postId, updatedPost, currentUser);
 
         return ResponseEntity.ok(post);
     }
@@ -97,7 +97,7 @@ public class PostController {
             @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
 
         if (customUserPrinciple == null) {
-            throw new IllegalStateException("No authenticated user found.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
         User currentUser = customUserPrinciple.getUser();
