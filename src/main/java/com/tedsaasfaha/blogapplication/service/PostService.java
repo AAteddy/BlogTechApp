@@ -13,7 +13,7 @@ public interface PostService {
     PostResponseDTO createPost(PostCreationRequestDTO postCreationRequestDTO,
                                CustomUserPrinciple customUserPrinciple);
 
-    Page<Post> getAllPublishedPosts(Pageable pageable);
+    Page<PostResponseDTO> getAllPublishedPosts(Pageable pageable);
 
     Page<Post> getPostByAuthor(User author, Pageable pageable);
 

@@ -33,6 +33,8 @@ public class PostServiceImpl implements PostService {
         post.setTitle(postCreationRequestDTO.getTitle());
         post.setContent(postCreationRequestDTO.getContent());
         post.setStatus(PostStatus.PUBLISHED); // Default status
+        post.setCreatedAt(LocalDateTime.now());
+        post.setUpdatedAt(LocalDateTime.now());
 
         // Set the authenticated user as the author
         User author = customUserPrinciple.getUser();
@@ -45,29 +47,11 @@ public class PostServiceImpl implements PostService {
         return mapToPostResponseDTO(savedPost);
     }
 
-    private PostResponseDTO mapToPostResponseDTO(Post post) {
-        PostResponseDTO responseDTO = new PostResponseDTO();
-        responseDTO.setId(post.getId());
-        responseDTO.setTitle(post.getTitle());
-        responseDTO.setContent(post.getContent());
-        responseDTO.setStatus(String.valueOf(post.getStatus()));
-        responseDTO.setCreatedAt(post.getCreatedAt());
-        responseDTO.setUpdatedAt(post.getUpdatedAt());
-
-        // Set author details
-        PostResponseDTO.AuthorResponseDTO authorDTO = new PostResponseDTO.AuthorResponseDTO();
-        authorDTO.setId(post.getAuthor().getId());
-        authorDTO.setEmail(post.getAuthor().getEmail());
-        authorDTO.setName(post.getAuthor().getName());
-        authorDTO.setRole(post.getAuthor().getRole().name());
-        responseDTO.setAuthor(authorDTO);
-
-        return responseDTO;
-    }
-
     @Override
-    public Page<Post> getAllPublishedPosts(Pageable pageable) {
-        return postRepo.findByStatus(PostStatus.PUBLISHED, pageable);
+    public Page<PostResponseDTO> getAllPublishedPosts(Pageable pageable) {
+        Page<Post> posts = postRepo.findByStatus(PostStatus.PUBLISHED, pageable);
+
+        return posts.map(this::mapToPostResponseDTO);
     }
 
     @Override
@@ -112,5 +96,26 @@ public class PostServiceImpl implements PostService {
 
         postRepo.delete(post);
     }
+
+    private PostResponseDTO mapToPostResponseDTO(Post post) {
+        PostResponseDTO responseDTO = new PostResponseDTO();
+        responseDTO.setId(post.getId());
+        responseDTO.setTitle(post.getTitle());
+        responseDTO.setContent(post.getContent());
+        responseDTO.setStatus(String.valueOf(post.getStatus()));
+        responseDTO.setCreatedAt(post.getCreatedAt());
+        responseDTO.setUpdatedAt(post.getUpdatedAt());
+
+        // Set author details
+        PostResponseDTO.AuthorResponseDTO authorDTO = new PostResponseDTO.AuthorResponseDTO();
+        authorDTO.setId(post.getAuthor().getId());
+        authorDTO.setEmail(post.getAuthor().getEmail());
+        authorDTO.setName(post.getAuthor().getName());
+        authorDTO.setRole(post.getAuthor().getRole().name());
+        responseDTO.setAuthor(authorDTO);
+
+        return responseDTO;
+    }
+
 }
 //

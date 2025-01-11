@@ -44,11 +44,10 @@ public class PostController {
     }
 
     @GetMapping()
-    public ResponseEntity<Page<Post>> getAllPublishedPosts(
+    public ResponseEntity<Page<PostResponseDTO>> getAllPublishedPosts(
             Pageable pageable) {
 
-        Page<Post> posts = postService.getAllPublishedPosts(pageable);
-
+        Page<PostResponseDTO> posts = postService.getAllPublishedPosts(pageable);
         return ResponseEntity.ok(posts);
     }
 
