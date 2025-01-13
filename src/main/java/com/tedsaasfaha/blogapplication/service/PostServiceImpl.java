@@ -2,6 +2,7 @@
 package com.tedsaasfaha.blogapplication.service;
 
 
+import com.tedsaasfaha.blogapplication.config.AuditorAwareImpl;
 import com.tedsaasfaha.blogapplication.dto.PostCreationRequestDTO;
 import com.tedsaasfaha.blogapplication.dto.PostResponseDTO;
 import com.tedsaasfaha.blogapplication.entity.Post;
@@ -41,9 +42,7 @@ public class PostServiceImpl implements PostService {
         post.setStatus(PostStatus.PUBLISHED); // Default status
         post.setCreatedAt(LocalDateTime.now());
         post.setUpdatedAt(LocalDateTime.now());
-
-        // Set the authenticated user as the author
-        post.setAuthor(currentUser);
+        post.setAuthor(currentUser); // Set the authenticated user as the author
 
         // Save the post
         Post savedPost = postRepo.save(post);
@@ -131,6 +130,9 @@ public class PostServiceImpl implements PostService {
         responseDTO.setStatus(String.valueOf(post.getStatus()));
         responseDTO.setCreatedAt(post.getCreatedAt());
         responseDTO.setUpdatedAt(post.getUpdatedAt());
+        responseDTO.setCreatedBy(post.getCreatedBy());
+        responseDTO.setUpdatedBy(post.getUpdatedBy());
+
 
         // Set author details
         PostResponseDTO.AuthorResponseDTO authorDTO = new PostResponseDTO.AuthorResponseDTO();
