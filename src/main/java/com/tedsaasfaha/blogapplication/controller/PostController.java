@@ -125,5 +125,19 @@ public class PostController {
 
         return ResponseEntity.ok("Post deleted successfully");
     }
+
+    @PatchMapping("/{postId}")
+    public ResponseEntity<String> restorePost(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
+
+        if (customUserPrinciple == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+        User currentUser = customUserPrinciple.getUser();
+        postService.restorePost(postId, currentUser);
+
+        return ResponseEntity.ok("Post restored successfully");
+    }
 }
 //

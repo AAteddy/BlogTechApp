@@ -42,5 +42,7 @@ public class Post {
 
     @LastModifiedBy
     private Long updatedBy; // User ID who last updated the post
+
+    private boolean isDeleted = false; // soft delete flag
 }
 //

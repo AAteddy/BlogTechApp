@@ -24,5 +24,7 @@ public interface PostService {
     PostResponseDTO updatePost(Long postId, PostCreationRequestDTO updatedPostDTO, User currentUser);
 
     void deletePost(Long postId, User currentUser);
+
+    void restorePost(Long postId, User currentUser);
 }
 //

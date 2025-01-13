@@ -2,7 +2,6 @@
 package com.tedsaasfaha.blogapplication.service;
 
 
-import com.tedsaasfaha.blogapplication.config.AuditorAwareImpl;
 import com.tedsaasfaha.blogapplication.dto.PostCreationRequestDTO;
 import com.tedsaasfaha.blogapplication.dto.PostResponseDTO;
 import com.tedsaasfaha.blogapplication.entity.Post;
@@ -64,7 +63,7 @@ public class PostServiceImpl implements PostService {
         if (!currentUser.getRole().equals(Role.ADMIN))
             throw new BadCredentialsException("You are not authorized to access this endpoint.");
 
-        Page<Post> posts = postRepo.findAll(pageable);
+        Page<Post> posts = postRepo.findAllActivePosts(pageable);
 
         return posts.map(this::mapToPostResponseDTO);
     }
@@ -80,6 +79,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostResponseDTO getPostById(Long postId) {
         Post post = postRepo.findById(postId)
+                .filter(p -> !p.isDeleted())
                 .orElseThrow(() -> new PostNotFoundException("Post not found"));
 
         return mapToPostResponseDTO(post);
@@ -119,7 +119,23 @@ public class PostServiceImpl implements PostService {
             throw new BadCredentialsException("You are not authorized to delete this post");
         }
 
-        postRepo.delete(post);
+        post.setDeleted(true);
+        postRepo.save(post);
+    }
+
+    // method for restoring soft-deleted posts
+    @Override
+    public void restorePost(Long postId, User currentUser) {
+        Post post = postRepo.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Post not found"));
+
+        // Only allow to delete if the user is the author or has admin role
+        if (!currentUser.getRole().equals(Role.ADMIN)) {
+            throw new BadCredentialsException("You are not authorized to delete this post");
+        }
+
+        post.setDeleted(false);
+        postRepo.save(post);
     }
 
     private PostResponseDTO mapToPostResponseDTO(Post post) {
