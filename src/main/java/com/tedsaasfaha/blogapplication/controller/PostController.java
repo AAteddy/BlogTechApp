@@ -97,7 +97,7 @@ public class PostController {
 //    @PreAuthorize("hasRole('WRITER') or hasRole('ADMIN')")
     public ResponseEntity<PostResponseDTO> updatePost(
             @PathVariable Long postId,
-            @RequestBody Post updatedPost,
+            @Valid @RequestBody PostCreationRequestDTO updatedPostDTO,
             @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
 
         if (customUserPrinciple == null) {
@@ -105,7 +105,7 @@ public class PostController {
         }
 
         User currentUser = customUserPrinciple.getUser();
-        PostResponseDTO post = postService.updatePost(postId, updatedPost, currentUser);
+        PostResponseDTO post = postService.updatePost(postId, updatedPostDTO, currentUser);
 
         return ResponseEntity.ok(post);
     }

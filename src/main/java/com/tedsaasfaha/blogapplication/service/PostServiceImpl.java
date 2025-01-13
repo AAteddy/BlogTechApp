@@ -87,7 +87,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponseDTO updatePost(Long postId, Post updatedPost, User currentUser) {
+    public PostResponseDTO updatePost(Long postId, PostCreationRequestDTO updatedPostDTO, User currentUser) {
         Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("Post not found"));
 
@@ -99,15 +99,15 @@ public class PostServiceImpl implements PostService {
             throw new BadCredentialsException("You are not authorized to update this post");
         }
 
-        post.setTitle(updatedPost.getTitle());
-        post.setContent(updatedPost.getContent());
+        post.setTitle(updatedPostDTO.getTitle());
+        post.setContent(updatedPostDTO.getContent());
         post.setStatus(PostStatus.PUBLISHED);
         post.setCreatedAt(post.getCreatedAt());
         post.setUpdatedAt(LocalDateTime.now());
 
-        Post postResponse = postRepo.save(post);
+        Post updatePost = postRepo.save(post);
 
-        return mapToPostResponseDTO(postResponse);
+        return mapToPostResponseDTO(updatePost);
     }
 
     @Override
