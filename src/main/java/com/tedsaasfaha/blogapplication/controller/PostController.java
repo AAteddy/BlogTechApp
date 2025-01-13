@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,7 @@ public class PostController {
 
 
     @PostMapping()
+//    @PreAuthorize("hasRole('WRITER') or hasRole('ADMIN')")
     public ResponseEntity<PostResponseDTO> createPost(
             @Valid @RequestBody PostCreationRequestDTO postCreationRequestDTO,
             @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
@@ -38,8 +40,10 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null); // Return 401 if user is not authenticated
         }
 
+        User currentUser = customUserPrinciple.getUser();
         // Pass only the User ID or CustomUserPrinciple to the service
-        PostResponseDTO postResponseDTO = postService.createPost(postCreationRequestDTO, customUserPrinciple);
+        PostResponseDTO postResponseDTO = postService.createPost(postCreationRequestDTO, currentUser);
+
         return ResponseEntity.ok(postResponseDTO);
     }
 
@@ -76,6 +80,7 @@ public class PostController {
     }
 
     @PutMapping("/{postId}")
+//    @PreAuthorize("hasRole('WRITER') or hasRole('ADMIN')")
     public ResponseEntity<PostResponseDTO> updatePost(
             @PathVariable Long postId,
             @RequestBody Post updatedPost,
@@ -92,6 +97,7 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deletePost(
             @PathVariable Long postId,
             @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {

@@ -12,6 +12,7 @@ import com.tedsaasfaha.blogapplication.exception.PostNotFoundException;
 import com.tedsaasfaha.blogapplication.repository.PostRepo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,7 +28,12 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostResponseDTO createPost(PostCreationRequestDTO postCreationRequestDTO,
-                                      CustomUserPrinciple customUserPrinciple) {
+                                      User currentUser) {
+
+        // Only allow Post creation if the user has WRITER or ADMIN role
+        if(currentUser.getRole().equals(Role.READER))
+            throw new BadCredentialsException("You are not authorized to create a Post");
+
         // Map DTO to entity
         Post post = new Post();
         post.setTitle(postCreationRequestDTO.getTitle());
@@ -37,8 +43,7 @@ public class PostServiceImpl implements PostService {
         post.setUpdatedAt(LocalDateTime.now());
 
         // Set the authenticated user as the author
-        User author = customUserPrinciple.getUser();
-        post.setAuthor(author);
+        post.setAuthor(currentUser);
 
         // Save the post
         Post savedPost = postRepo.save(post);
@@ -75,9 +80,11 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() -> new PostNotFoundException("Post not found"));
 
         // Only allow update if the user is the author or has admin role
-        if (!post.getAuthor().equals(currentUser) &&
+        if (!(post.getAuthor().getId().equals(currentUser.getId())
+                && currentUser.getRole().equals(Role.WRITER))
+                &&
                 !currentUser.getRole().equals(Role.ADMIN)) {
-            throw new SecurityException("You are not authorized to update this post");
+            throw new BadCredentialsException("You are not authorized to update this post");
         }
 
         post.setTitle(updatedPost.getTitle());
@@ -97,9 +104,8 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() -> new PostNotFoundException("Post not found"));
 
         // Only allow to delete if the user is the author or has admin role
-        if (!post.getAuthor().equals(currentUser) &&
-                !currentUser.getRole().equals(Role.ADMIN)) {
-            throw new SecurityException("You are not authorized to delete this post");
+        if (!currentUser.getRole().equals(Role.ADMIN)) {
+            throw new BadCredentialsException("You are not authorized to delete this post");
         }
 
         postRepo.delete(post);
@@ -124,15 +130,6 @@ public class PostServiceImpl implements PostService {
 
         return responseDTO;
     }
-
-//    private Post mapToPost(PostResponseDTO postDTO) {
-//        Post post = new Post();
-//        post.setTitle(postDTO.getTitle());
-//        post.setContent(postDTO.getContent());
-//        post.setUpdatedAt(LocalDateTime.now());
-//
-//        return post;
-//    }
 
 }
 //

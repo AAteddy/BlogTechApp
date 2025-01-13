@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 public interface PostService {
 
     PostResponseDTO createPost(PostCreationRequestDTO postCreationRequestDTO,
-                               CustomUserPrinciple customUserPrinciple);
+                               User currentUser);
 
     Page<PostResponseDTO> getAllPublishedPosts(Pageable pageable);
 
