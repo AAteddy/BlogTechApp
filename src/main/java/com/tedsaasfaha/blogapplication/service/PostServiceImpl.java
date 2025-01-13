@@ -12,6 +12,7 @@ import com.tedsaasfaha.blogapplication.exception.PostNotFoundException;
 import com.tedsaasfaha.blogapplication.repository.PostRepo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,22 +28,87 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostResponseDTO createPost(PostCreationRequestDTO postCreationRequestDTO,
-                                      CustomUserPrinciple customUserPrinciple) {
+                                      User currentUser) {
+
+        // Only allow Post creation if the user has WRITER or ADMIN role
+        if(currentUser.getRole().equals(Role.READER))
+            throw new BadCredentialsException("You are not authorized to create a Post");
+
         // Map DTO to entity
         Post post = new Post();
         post.setTitle(postCreationRequestDTO.getTitle());
         post.setContent(postCreationRequestDTO.getContent());
         post.setStatus(PostStatus.PUBLISHED); // Default status
+        post.setCreatedAt(LocalDateTime.now());
+        post.setUpdatedAt(LocalDateTime.now());
 
         // Set the authenticated user as the author
-        User author = customUserPrinciple.getUser();
-        post.setAuthor(author);
+        post.setAuthor(currentUser);
 
         // Save the post
         Post savedPost = postRepo.save(post);
 
         // Map entity to response DTO
         return mapToPostResponseDTO(savedPost);
+    }
+
+    @Override
+    public Page<PostResponseDTO> getAllPublishedPosts(Pageable pageable) {
+        Page<Post> posts = postRepo.findByStatus(PostStatus.PUBLISHED, pageable);
+
+        return posts.map(this::mapToPostResponseDTO);
+    }
+
+    @Override
+    public Page<PostResponseDTO> getPostByAuthor(User author, Pageable pageable) {
+        Page<Post> posts = postRepo.findByAuthor(author, pageable);
+
+        return posts.map(this::mapToPostResponseDTO);
+    }
+
+    @Override
+    public PostResponseDTO getPostById(Long postId) {
+        Post post = postRepo.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Post not found"));
+
+        return mapToPostResponseDTO(post);
+    }
+
+    @Override
+    public PostResponseDTO updatePost(Long postId, Post updatedPost, User currentUser) {
+        Post post = postRepo.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Post not found"));
+
+        // Only allow update if the user is the author or has admin role
+        if (!(post.getAuthor().getId().equals(currentUser.getId())
+                && currentUser.getRole().equals(Role.WRITER))
+                &&
+                !currentUser.getRole().equals(Role.ADMIN)) {
+            throw new BadCredentialsException("You are not authorized to update this post");
+        }
+
+        post.setTitle(updatedPost.getTitle());
+        post.setContent(updatedPost.getContent());
+        post.setStatus(PostStatus.PUBLISHED);
+        post.setCreatedAt(post.getCreatedAt());
+        post.setUpdatedAt(LocalDateTime.now());
+
+        Post postResponse = postRepo.save(post);
+
+        return mapToPostResponseDTO(postResponse);
+    }
+
+    @Override
+    public void deletePost(Long postId, User currentUser) {
+        Post post = postRepo.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Post not found"));
+
+        // Only allow to delete if the user is the author or has admin role
+        if (!currentUser.getRole().equals(Role.ADMIN)) {
+            throw new BadCredentialsException("You are not authorized to delete this post");
+        }
+
+        postRepo.delete(post);
     }
 
     private PostResponseDTO mapToPostResponseDTO(Post post) {
@@ -65,52 +131,5 @@ public class PostServiceImpl implements PostService {
         return responseDTO;
     }
 
-    @Override
-    public Page<Post> getAllPublishedPosts(Pageable pageable) {
-        return postRepo.findByStatus(PostStatus.PUBLISHED, pageable);
-    }
-
-    @Override
-    public Page<Post> getPostByAuthor(User author, Pageable pageable) {
-        return postRepo.findByAuthor(author, pageable);
-    }
-
-    @Override
-    public Post getPostById(Long postId) {
-        return postRepo.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("Post not found"));
-    }
-
-    @Override
-    public Post updatePost(Long postId, Post updatedPost, User currentUser) {
-        Post post = getPostById(postId);
-
-        // Only allow update if the user is the author or has admin role
-        if (!post.getAuthor().equals(currentUser) &&
-                !currentUser.getRole().equals(Role.ADMIN)) {
-            throw new SecurityException("You are not authorized to update this post");
-        }
-
-        post.setTitle(updatedPost.getTitle());
-        post.setContent(updatedPost.getContent());
-        post.setStatus(updatedPost.getStatus());
-        post.setUpdatedAt(LocalDateTime.now());
-
-        return postRepo.save(post);
-    }
-
-    @Override
-    public void deletePost(Long postId, User currentUser) {
-
-        Post post = getPostById(postId);
-
-        // Only allow to delete if the user is the author or has admin role
-        if (!post.getAuthor().equals(currentUser) &&
-                !currentUser.getRole().equals(Role.ADMIN)) {
-            throw new SecurityException("You are not authorized to delete this post");
-        }
-
-        postRepo.delete(post);
-    }
 }
 //

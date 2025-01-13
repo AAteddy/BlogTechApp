@@ -11,15 +11,15 @@ import org.springframework.data.domain.Pageable;
 public interface PostService {
 
     PostResponseDTO createPost(PostCreationRequestDTO postCreationRequestDTO,
-                               CustomUserPrinciple customUserPrinciple);
+                               User currentUser);
 
-    Page<Post> getAllPublishedPosts(Pageable pageable);
+    Page<PostResponseDTO> getAllPublishedPosts(Pageable pageable);
 
-    Page<Post> getPostByAuthor(User author, Pageable pageable);
+    Page<PostResponseDTO> getPostByAuthor(User author, Pageable pageable);
 
-    Post getPostById(Long postId);
+    PostResponseDTO getPostById(Long postId);
 
-    Post updatePost(Long postId, Post updatedPost, User currentUser);
+    PostResponseDTO updatePost(Long postId, Post updatedPost, User currentUser);
 
     void deletePost(Long postId, User currentUser);
 }
