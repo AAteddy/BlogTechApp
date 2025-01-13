@@ -15,6 +15,8 @@ public interface PostService {
 
     Page<PostResponseDTO> getAllPublishedPosts(Pageable pageable);
 
+    Page<PostResponseDTO> getAllPosts(Pageable pageable, User currentUser);
+
     Page<PostResponseDTO> getPostByAuthor(User author, Pageable pageable);
 
     PostResponseDTO getPostById(Long postId);

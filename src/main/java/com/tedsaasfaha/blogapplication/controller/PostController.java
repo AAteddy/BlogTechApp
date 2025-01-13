@@ -55,6 +55,20 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<Page<PostResponseDTO>> getAllPosts(
+            Pageable pageable,
+            @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
+
+        if (customUserPrinciple == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+        User currentUser = customUserPrinciple.getUser();
+
+        Page<PostResponseDTO> posts = postService.getAllPosts(pageable, currentUser);
+        return ResponseEntity.ok(posts);
+    }
+
     @GetMapping("/author")
     public ResponseEntity<Page<PostResponseDTO>> getPostsByAuthor(
             @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple,

@@ -40,9 +40,9 @@ public class SecurityConfig {
 //                        .requestMatchers(HttpMethod.POST, "/api/posts").hasAnyRole("WRITER", "ADMIN")
 //                        .requestMatchers(HttpMethod.PUT, "/api/posts/**").hasAnyRole("WRITER", "ADMIN")
 //                        .requestMatchers(HttpMethod.GET, "/api/posts/**").hasAnyRole("READER", "WRITER", "ADMIN")
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/writer/**").hasRole("WRITER")
-                        .requestMatchers("/api/reader/**").hasAnyRole("READER", "WRITER", "ADMIN")
+//                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+//                        .requestMatchers("/api/writer/**").hasRole("WRITER")
+//                        .requestMatchers("/api/reader/**").hasAnyRole("READER", "WRITER", "ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception
                 .authenticationEntryPoint(customAuthenticationEntryPoint)) // Set custom entry point

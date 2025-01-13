@@ -60,6 +60,18 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public Page<PostResponseDTO> getAllPosts(Pageable pageable,
+                                             User currentUser) {
+        if (!currentUser.getRole().equals(Role.ADMIN))
+            throw new BadCredentialsException("You are not authorized to access this endpoint.");
+
+        Page<Post> posts = postRepo.findAll(pageable);
+
+        return posts.map(this::mapToPostResponseDTO);
+    }
+
+
+    @Override
     public Page<PostResponseDTO> getPostByAuthor(User author, Pageable pageable) {
         Page<Post> posts = postRepo.findByAuthor(author, pageable);
 
