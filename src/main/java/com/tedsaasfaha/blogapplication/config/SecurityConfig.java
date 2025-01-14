@@ -38,7 +38,11 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/signup",
                                 "/api/auth/login",
-                                "/api/auth/refresh-token").permitAll()
+                                "/api/auth/refresh-token",
+                                "/swagger-ui/**",      // Allow Swagger UI resources
+                                "/v3/api-docs/**",     // Allow OpenAPI documentation
+                                "/swagger-ui.html"     // Allow Swagger UI entry point
+                        ).permitAll()
 //                        .requestMatchers(HttpMethod.DELETE, "/api/posts/**").hasRole("ADMIN")
 //                        .requestMatchers(HttpMethod.POST, "/api/posts").hasAnyRole("WRITER", "ADMIN")
 //                        .requestMatchers(HttpMethod.PUT, "/api/posts/**").hasAnyRole("WRITER", "ADMIN")
@@ -70,4 +74,6 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 }
+//
+//
 //

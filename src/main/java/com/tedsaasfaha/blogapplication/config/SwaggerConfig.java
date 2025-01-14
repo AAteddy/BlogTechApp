@@ -1,3 +1,4 @@
+
 package com.tedsaasfaha.blogapplication.config;
 
 
@@ -18,3 +19,4 @@ public class SwaggerConfig {
                         .description("API documentation for the Blog Tech Application"));
     }
 }
+//
