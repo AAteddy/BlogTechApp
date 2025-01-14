@@ -38,7 +38,7 @@ public class PostServiceImpl implements PostService {
         Post post = new Post();
         post.setTitle(postCreationRequestDTO.getTitle());
         post.setContent(postCreationRequestDTO.getContent());
-        post.setStatus(PostStatus.PUBLISHED); // Default status
+//        post.setStatus(PostStatus.PUBLISHED); // Default status
         post.setCreatedAt(LocalDateTime.now());
         post.setUpdatedAt(LocalDateTime.now());
         post.setAuthor(currentUser); // Set the authenticated user as the author
@@ -100,7 +100,7 @@ public class PostServiceImpl implements PostService {
 
         post.setTitle(updatedPostDTO.getTitle());
         post.setContent(updatedPostDTO.getContent());
-        post.setStatus(PostStatus.PUBLISHED);
+//        post.setStatus(PostStatus.PUBLISHED);
         post.setCreatedAt(post.getCreatedAt());
         post.setUpdatedAt(LocalDateTime.now());
 
@@ -108,6 +108,27 @@ public class PostServiceImpl implements PostService {
 
         return mapToPostResponseDTO(updatePost);
     }
+
+    @Override
+    public PostResponseDTO updatePostStatus(Long postId, PostStatus newStatus, User currentUser) {
+        Post post = postRepo.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Post not found with Post Id: " + postId));
+
+        // Only allow update if the user is the author or has admin role
+        if (!(post.getAuthor().getId().equals(currentUser.getId())
+                && currentUser.getRole().equals(Role.WRITER))
+                &&
+                !currentUser.getRole().equals(Role.ADMIN)) {
+            throw new BadCredentialsException("You are not authorized to update this post");
+        }
+
+        post.setStatus(newStatus);
+        post.setUpdatedAt(LocalDateTime.now());
+        Post updatedPost = postRepo.save(post);
+
+        return mapToPostResponseDTO(updatedPost);
+    }
+
 
     @Override
     public void deletePost(Long postId, User currentUser) {

@@ -5,6 +5,7 @@ package com.tedsaasfaha.blogapplication.controller;
 import com.tedsaasfaha.blogapplication.dto.PostCreationRequestDTO;
 import com.tedsaasfaha.blogapplication.dto.PostResponseDTO;
 import com.tedsaasfaha.blogapplication.entity.Post;
+import com.tedsaasfaha.blogapplication.entity.PostStatus;
 import com.tedsaasfaha.blogapplication.entity.User;
 import com.tedsaasfaha.blogapplication.service.CustomUserPrinciple;
 import com.tedsaasfaha.blogapplication.service.PostService;
@@ -106,6 +107,21 @@ public class PostController {
 
         User currentUser = customUserPrinciple.getUser();
         PostResponseDTO post = postService.updatePost(postId, updatedPostDTO, currentUser);
+
+        return ResponseEntity.ok(post);
+    }
+
+    @PutMapping("/{postId}/status")
+    public ResponseEntity<PostResponseDTO> updatePostStatus(
+            @PathVariable Long postId,
+            @RequestParam("newStatus") PostStatus newStatus,
+            @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
+
+        if (customUserPrinciple == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+        User currentUser = customUserPrinciple.getUser();
+        PostResponseDTO post = postService.updatePostStatus(postId, newStatus, currentUser);
 
         return ResponseEntity.ok(post);
     }

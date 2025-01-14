@@ -25,7 +25,7 @@ public class Post {
     private String content;
 
     @Enumerated(EnumType.STRING)
-    private PostStatus status;
+    private PostStatus status = PostStatus.DRAFT; // Default
 
     private LocalDateTime createdAt;
 
