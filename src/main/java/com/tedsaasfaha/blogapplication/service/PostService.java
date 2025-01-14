@@ -3,7 +3,6 @@ package com.tedsaasfaha.blogapplication.service;
 
 import com.tedsaasfaha.blogapplication.dto.PostCreationRequestDTO;
 import com.tedsaasfaha.blogapplication.dto.PostResponseDTO;
-import com.tedsaasfaha.blogapplication.entity.Post;
 import com.tedsaasfaha.blogapplication.entity.PostStatus;
 import com.tedsaasfaha.blogapplication.entity.User;
 import org.springframework.data.domain.Page;

@@ -9,6 +9,7 @@ import com.tedsaasfaha.blogapplication.entity.Role;
 import com.tedsaasfaha.blogapplication.entity.User;
 import com.tedsaasfaha.blogapplication.service.AuthService;
 import com.tedsaasfaha.blogapplication.service.UserService;
+import com.tedsaasfaha.blogapplication.util.JwtUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -23,11 +24,14 @@ public class AuthenticationController {
 
     private final UserService userService;
     private final AuthService authService;
+    private final JwtUtil jwtUtil;
 
     public AuthenticationController(UserService userService,
-                                    AuthService authService) {
+                                    AuthService authService,
+                                    JwtUtil jwtUtil) {
         this.userService = userService;
         this.authService = authService;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/signup")
@@ -58,6 +62,26 @@ public class AuthenticationController {
 
         TokenDTO token = authService.login(loginDTO);
         return ResponseEntity.ok(token);
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<TokenDTO> refreshToken(
+            @RequestBody TokenDTO tokenDTO
+    ) {
+
+        String refreshToken = tokenDTO.getRefreshToken();
+
+        // Validate refresh token
+        if (!jwtUtil.validateToken(refreshToken))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        String username = jwtUtil.extractUsername(refreshToken);
+        String role = jwtUtil.extractRole(refreshToken);
+
+        // Generate a new access token
+        String newAccessToken = jwtUtil.generateAccessToken(username, role);
+
+        return ResponseEntity.ok(new TokenDTO(newAccessToken, refreshToken));
     }
 }
 //
