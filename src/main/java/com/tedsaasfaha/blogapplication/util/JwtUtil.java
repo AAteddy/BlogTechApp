@@ -17,18 +17,41 @@ public class JwtUtil {
 
     private final SecretKey key = Keys.hmacShaKeyFor(JwtConstant.SECRET_KEY.getBytes());
 
-    // Generate JWT Token
-    public String generateToken(String username, String role) {
+    // Generate JWT Access Token
+    public String generateAccessToken(String username, String role) {
         return Jwts.builder()
                 .subject(username)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + JwtConstant.EXPIRATION_TIME))
+                .expiration(new Date(System.currentTimeMillis() + JwtConstant.ACCESS_TOKEN_VALIDITY))
                 .signWith(key) // Specify algorithm explicitly
                 .compact();
     }
 
-    // Validate JWT Token
+    // Generate JWT Refresh Token
+    public String generateRefreshToken(String username, String role) {
+        return Jwts.builder()
+                .subject(username)
+                .claim("role", role)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + JwtConstant.REFRESH_TOKEN_VALIDITY))
+                .signWith(key)
+                .compact();
+    }
+
+    // Validate a JWT Refresh Token
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token);
+            return true;
+        } catch (JwtException e) {
+            return false; // Token is invalid
+        }
+    }
+
     public boolean validateToken(String token, UserDetails userDetails) {
         String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
