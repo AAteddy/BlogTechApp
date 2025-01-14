@@ -17,6 +17,8 @@ public class PostResponseDTO {
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Long createdBy;
+    private Long updatedBy;
 
     private AuthorResponseDTO author;
 

@@ -5,6 +5,7 @@ package com.tedsaasfaha.blogapplication.controller;
 import com.tedsaasfaha.blogapplication.dto.PostCreationRequestDTO;
 import com.tedsaasfaha.blogapplication.dto.PostResponseDTO;
 import com.tedsaasfaha.blogapplication.entity.Post;
+import com.tedsaasfaha.blogapplication.entity.PostStatus;
 import com.tedsaasfaha.blogapplication.entity.User;
 import com.tedsaasfaha.blogapplication.service.CustomUserPrinciple;
 import com.tedsaasfaha.blogapplication.service.PostService;
@@ -55,6 +56,20 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<Page<PostResponseDTO>> getAllPosts(
+            Pageable pageable,
+            @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
+
+        if (customUserPrinciple == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+        User currentUser = customUserPrinciple.getUser();
+
+        Page<PostResponseDTO> posts = postService.getAllPosts(pageable, currentUser);
+        return ResponseEntity.ok(posts);
+    }
+
     @GetMapping("/author")
     public ResponseEntity<Page<PostResponseDTO>> getPostsByAuthor(
             @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple,
@@ -83,7 +98,7 @@ public class PostController {
 //    @PreAuthorize("hasRole('WRITER') or hasRole('ADMIN')")
     public ResponseEntity<PostResponseDTO> updatePost(
             @PathVariable Long postId,
-            @RequestBody Post updatedPost,
+            @Valid @RequestBody PostCreationRequestDTO updatedPostDTO,
             @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
 
         if (customUserPrinciple == null) {
@@ -91,7 +106,22 @@ public class PostController {
         }
 
         User currentUser = customUserPrinciple.getUser();
-        PostResponseDTO post = postService.updatePost(postId, updatedPost, currentUser);
+        PostResponseDTO post = postService.updatePost(postId, updatedPostDTO, currentUser);
+
+        return ResponseEntity.ok(post);
+    }
+
+    @PutMapping("/{postId}/status")
+    public ResponseEntity<PostResponseDTO> updatePostStatus(
+            @PathVariable Long postId,
+            @RequestParam("newStatus") PostStatus newStatus,
+            @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
+
+        if (customUserPrinciple == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+        User currentUser = customUserPrinciple.getUser();
+        PostResponseDTO post = postService.updatePostStatus(postId, newStatus, currentUser);
 
         return ResponseEntity.ok(post);
     }
@@ -110,6 +140,20 @@ public class PostController {
         postService.deletePost(postId, currentUser);
 
         return ResponseEntity.ok("Post deleted successfully");
+    }
+
+    @PatchMapping("/{postId}")
+    public ResponseEntity<String> restorePost(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
+
+        if (customUserPrinciple == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+        User currentUser = customUserPrinciple.getUser();
+        postService.restorePost(postId, currentUser);
+
+        return ResponseEntity.ok("Post restored successfully");
     }
 }
 //

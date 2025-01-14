@@ -38,12 +38,10 @@ public class PostServiceImpl implements PostService {
         Post post = new Post();
         post.setTitle(postCreationRequestDTO.getTitle());
         post.setContent(postCreationRequestDTO.getContent());
-        post.setStatus(PostStatus.PUBLISHED); // Default status
+//        post.setStatus(PostStatus.PUBLISHED); // Default status
         post.setCreatedAt(LocalDateTime.now());
         post.setUpdatedAt(LocalDateTime.now());
-
-        // Set the authenticated user as the author
-        post.setAuthor(currentUser);
+        post.setAuthor(currentUser); // Set the authenticated user as the author
 
         // Save the post
         Post savedPost = postRepo.save(post);
@@ -60,6 +58,18 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public Page<PostResponseDTO> getAllPosts(Pageable pageable,
+                                             User currentUser) {
+        if (!currentUser.getRole().equals(Role.ADMIN))
+            throw new BadCredentialsException("You are not authorized to access this endpoint.");
+
+        Page<Post> posts = postRepo.findAllActivePosts(pageable);
+
+        return posts.map(this::mapToPostResponseDTO);
+    }
+
+
+    @Override
     public Page<PostResponseDTO> getPostByAuthor(User author, Pageable pageable) {
         Page<Post> posts = postRepo.findByAuthor(author, pageable);
 
@@ -69,13 +79,14 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostResponseDTO getPostById(Long postId) {
         Post post = postRepo.findById(postId)
+                .filter(p -> !p.isDeleted())
                 .orElseThrow(() -> new PostNotFoundException("Post not found"));
 
         return mapToPostResponseDTO(post);
     }
 
     @Override
-    public PostResponseDTO updatePost(Long postId, Post updatedPost, User currentUser) {
+    public PostResponseDTO updatePost(Long postId, PostCreationRequestDTO updatedPostDTO, User currentUser) {
         Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("Post not found"));
 
@@ -87,16 +98,37 @@ public class PostServiceImpl implements PostService {
             throw new BadCredentialsException("You are not authorized to update this post");
         }
 
-        post.setTitle(updatedPost.getTitle());
-        post.setContent(updatedPost.getContent());
-        post.setStatus(PostStatus.PUBLISHED);
+        post.setTitle(updatedPostDTO.getTitle());
+        post.setContent(updatedPostDTO.getContent());
+//        post.setStatus(PostStatus.PUBLISHED);
         post.setCreatedAt(post.getCreatedAt());
         post.setUpdatedAt(LocalDateTime.now());
 
-        Post postResponse = postRepo.save(post);
+        Post updatePost = postRepo.save(post);
 
-        return mapToPostResponseDTO(postResponse);
+        return mapToPostResponseDTO(updatePost);
     }
+
+    @Override
+    public PostResponseDTO updatePostStatus(Long postId, PostStatus newStatus, User currentUser) {
+        Post post = postRepo.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Post not found with Post Id: " + postId));
+
+        // Only allow update if the user is the author or has admin role
+        if (!(post.getAuthor().getId().equals(currentUser.getId())
+                && currentUser.getRole().equals(Role.WRITER))
+                &&
+                !currentUser.getRole().equals(Role.ADMIN)) {
+            throw new BadCredentialsException("You are not authorized to update this post");
+        }
+
+        post.setStatus(newStatus);
+        post.setUpdatedAt(LocalDateTime.now());
+        Post updatedPost = postRepo.save(post);
+
+        return mapToPostResponseDTO(updatedPost);
+    }
+
 
     @Override
     public void deletePost(Long postId, User currentUser) {
@@ -108,7 +140,23 @@ public class PostServiceImpl implements PostService {
             throw new BadCredentialsException("You are not authorized to delete this post");
         }
 
-        postRepo.delete(post);
+        post.setDeleted(true);
+        postRepo.save(post);
+    }
+
+    // method for restoring soft-deleted posts
+    @Override
+    public void restorePost(Long postId, User currentUser) {
+        Post post = postRepo.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("Post not found"));
+
+        // Only allow to delete if the user is the author or has admin role
+        if (!currentUser.getRole().equals(Role.ADMIN)) {
+            throw new BadCredentialsException("You are not authorized to delete this post");
+        }
+
+        post.setDeleted(false);
+        postRepo.save(post);
     }
 
     private PostResponseDTO mapToPostResponseDTO(Post post) {
@@ -119,6 +167,9 @@ public class PostServiceImpl implements PostService {
         responseDTO.setStatus(String.valueOf(post.getStatus()));
         responseDTO.setCreatedAt(post.getCreatedAt());
         responseDTO.setUpdatedAt(post.getUpdatedAt());
+        responseDTO.setCreatedBy(post.getCreatedBy());
+        responseDTO.setUpdatedBy(post.getUpdatedBy());
+
 
         // Set author details
         PostResponseDTO.AuthorResponseDTO authorDTO = new PostResponseDTO.AuthorResponseDTO();
