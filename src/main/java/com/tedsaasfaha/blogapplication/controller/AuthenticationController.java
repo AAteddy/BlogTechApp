@@ -66,8 +66,7 @@ public class AuthenticationController {
 
     @PostMapping("/refresh-token")
     public ResponseEntity<TokenDTO> refreshToken(
-            @RequestBody TokenDTO tokenDTO
-    ) {
+            @RequestBody TokenDTO tokenDTO) {
 
         String refreshToken = tokenDTO.getRefreshToken();
 
