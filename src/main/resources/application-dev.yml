@@ -29,6 +29,9 @@ spring:
 logging:
   level:
     org:
-      springframework: INFO
+      springframework:
+        cache: DEBUG
+        data:
+          redis: DEBUG
     com:
       tedsaasfaha: DEBUG

@@ -5,11 +5,12 @@ package com.tedsaasfaha.blogapplication.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class PostResponseDTO {
+public class PostResponseDTO implements Serializable {
 
     private Long id;
     private String title;
@@ -24,7 +25,7 @@ public class PostResponseDTO {
 
     @Getter
     @Setter
-    public static class AuthorResponseDTO {
+    public static class AuthorResponseDTO implements Serializable {
         // Nested DTO for author details
         private Long id;
         private String email;

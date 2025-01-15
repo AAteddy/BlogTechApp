@@ -89,7 +89,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @CacheEvict(value = "publishedPosts", allEntries = true)
+    @CacheEvict(value = {"publishedPosts", "postById"}, key = "#postId", allEntries = true)
     public PostResponseDTO updatePost(Long postId, PostCreationRequestDTO updatedPostDTO, User currentUser) {
         Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("Post not found"));
@@ -114,7 +114,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @CacheEvict(value = "publishedPosts", condition = "#newStatus == 'PUBLISHED'")
+    @CacheEvict(value = {"publishedPosts", "postById"}, key = "#postId", condition = "#newStatus == 'PUBLISHED'", allEntries = true)
     public PostResponseDTO updatePostStatus(Long postId, PostStatus newStatus, User currentUser) {
         Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("Post not found with Post Id: " + postId));
@@ -127,7 +127,16 @@ public class PostServiceImpl implements PostService {
             throw new BadCredentialsException("You are not authorized to update this post");
         }
 
-        post.setStatus(newStatus);
+        if (PostStatus.PUBLISHED.equals(newStatus)) {
+            post.setStatus(PostStatus.PUBLISHED);
+        }
+        else if (PostStatus.ARCHIVED.equals(newStatus)) {
+            post.setStatus(PostStatus.ARCHIVED);
+        }
+        else if (PostStatus.DRAFT.equals(newStatus)) {
+            post.setStatus(PostStatus.DRAFT);
+        }
+
         post.setUpdatedAt(LocalDateTime.now());
         Post updatedPost = postRepo.save(post);
 
@@ -136,7 +145,7 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
-    @CacheEvict(value = "publishedPosts", allEntries = true)
+    @CacheEvict(value = {"publishedPosts", "postById"}, key = "#postId", allEntries = true)
     public void deletePost(Long postId, User currentUser) {
         Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("Post not found"));
