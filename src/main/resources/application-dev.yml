@@ -26,12 +26,12 @@ spring:
   cache:
     type: redis
 
-logging:
-  level:
-    org:
-      springframework:
-        cache: DEBUG
-        data:
-          redis: DEBUG
-    com:
-      tedsaasfaha: DEBUG
+#logging:
+#  level:
+#    org:
+#      springframework:
+#        cache: DEBUG
+#        data:
+#          redis: DEBUG
+#    com:
+#      tedsaasfaha: DEBUG
