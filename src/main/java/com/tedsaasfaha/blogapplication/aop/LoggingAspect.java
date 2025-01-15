@@ -17,7 +17,7 @@ public class LoggingAspect {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
-    @Pointcut("execution(* com.tedsaasfaha.blogapplication.service.PostServiceImpl.*(..))")
+    @Pointcut("execution(* com.tedsaasfaha.blogapplication.service..*)")
     public void postServiceMethods() {}
 
     @Before("postServiceMethods()")

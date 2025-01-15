@@ -7,12 +7,16 @@ import com.tedsaasfaha.blogapplication.dto.UserLoginDTO;
 import com.tedsaasfaha.blogapplication.entity.User;
 import com.tedsaasfaha.blogapplication.repository.UserRepo;
 import com.tedsaasfaha.blogapplication.util.JwtUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     private final UserRepo userRepo;
 
@@ -34,6 +38,7 @@ public class AuthService {
                         "Invalid email or password"));
 
         if(!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+            logger.warn("User with username: {} has tried to access with an Invalid password", user.getEmail());
             throw new BadCredentialsException("Invalid email or password");
         }
 
