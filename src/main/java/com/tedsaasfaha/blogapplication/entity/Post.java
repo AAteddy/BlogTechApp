@@ -45,6 +45,6 @@ public class Post {
 
     private boolean isDeleted = false; // soft delete flag
 
-    private LocalDateTime deleteAt;
+    private LocalDateTime deletedAt;
 }
 //

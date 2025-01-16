@@ -10,7 +10,7 @@ spring:
     password: root
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
@@ -28,7 +28,7 @@ spring:
 
 post:
   retention:
-    period: 30
+    period: 1 # Retention period in days
 
 #logging:
 #  level:
