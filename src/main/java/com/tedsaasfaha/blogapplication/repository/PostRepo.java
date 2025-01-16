@@ -8,7 +8,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Repository
@@ -23,6 +27,8 @@ public interface PostRepo extends JpaRepository<Post, Long> {
     @Query("SELECT p FROM Post p WHERE p.author = :author AND p.isDeleted = false")
     Page<Post> findByAuthor(User author, Pageable pageable);
 
+    @Query("SELECT p FROM Post p WHERE p.isDeleted = true AND p.deletedAt <= :thresholdDate")
+    List<Post> findPostsForHardDeletion(@Param("thresholdDate") LocalDateTime thresholdDate);
 
 //    Page<Post> findByAuthorAndStatus(User author, PostStatus status, Pageable pageable);
 }
