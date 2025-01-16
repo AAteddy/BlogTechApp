@@ -10,6 +10,8 @@ import com.tedsaasfaha.blogapplication.entity.Role;
 import com.tedsaasfaha.blogapplication.entity.User;
 import com.tedsaasfaha.blogapplication.exception.PostNotFoundException;
 import com.tedsaasfaha.blogapplication.repository.PostRepo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,8 @@ import java.time.LocalDateTime;
 @Service
 public class PostServiceImpl implements PostService {
 
+    private static final Logger logger = LoggerFactory.getLogger(PostServiceImpl.class);
+
     private final PostRepo postRepo;
 
     public PostServiceImpl(PostRepo postRepo) {
@@ -33,8 +37,10 @@ public class PostServiceImpl implements PostService {
                                       User currentUser) {
 
         // Only allow Post creation if the user has WRITER or ADMIN role
-        if(currentUser.getRole().equals(Role.READER))
+        if(currentUser.getRole().equals(Role.READER)) {
+            getWarn(currentUser);
             throw new BadCredentialsException("You are not authorized to create a Post");
+        }
 
         // Map DTO to entity
         Post post = new Post();
@@ -45,8 +51,10 @@ public class PostServiceImpl implements PostService {
         post.setUpdatedAt(LocalDateTime.now());
         post.setAuthor(currentUser); // Set the authenticated user as the author
 
+        logger.info("Creating post with title: {}", post.getTitle());
         // Save the post
         Post savedPost = postRepo.save(post);
+        logger.info("Post created successfully with ID: {}", savedPost.getId());
 
         // Map entity to response DTO
         return mapToPostResponseDTO(savedPost);
@@ -63,8 +71,10 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<PostResponseDTO> getAllPosts(Pageable pageable,
                                              User currentUser) {
-        if (!currentUser.getRole().equals(Role.ADMIN))
+        if (!currentUser.getRole().equals(Role.ADMIN)) {
+            getWarn(currentUser);
             throw new BadCredentialsException("You are not authorized to access this endpoint.");
+        }
 
         Page<Post> posts = postRepo.findAllActivePosts(pageable);
 
@@ -99,6 +109,7 @@ public class PostServiceImpl implements PostService {
                 && currentUser.getRole().equals(Role.WRITER))
                 &&
                 !currentUser.getRole().equals(Role.ADMIN)) {
+            getWarn(currentUser);
             throw new BadCredentialsException("You are not authorized to update this post");
         }
 
@@ -116,6 +127,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @CacheEvict(value = {"publishedPosts", "postById"}, key = "#postId", condition = "#newStatus == 'PUBLISHED'", allEntries = true)
     public PostResponseDTO updatePostStatus(Long postId, PostStatus newStatus, User currentUser) {
+        logger.info("Updating status of post with ID: {} to {}", postId, newStatus);
         Post post = postRepo.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("Post not found with Post Id: " + postId));
 
@@ -124,6 +136,7 @@ public class PostServiceImpl implements PostService {
                 && currentUser.getRole().equals(Role.WRITER))
                 &&
                 !currentUser.getRole().equals(Role.ADMIN)) {
+            getWarn(currentUser);
             throw new BadCredentialsException("You are not authorized to update this post");
         }
 
@@ -139,6 +152,7 @@ public class PostServiceImpl implements PostService {
 
         post.setUpdatedAt(LocalDateTime.now());
         Post updatedPost = postRepo.save(post);
+        logger.info("Post status updated successfully.");
 
         return mapToPostResponseDTO(updatedPost);
     }
@@ -152,11 +166,14 @@ public class PostServiceImpl implements PostService {
 
         // Only allow to delete if the user is the author or has admin role
         if (!currentUser.getRole().equals(Role.ADMIN)) {
+            getWarn(currentUser);
             throw new BadCredentialsException("You are not authorized to delete this post");
         }
 
+        logger.info("Deleting post with ID: {}",postId);
         post.setDeleted(true);
         postRepo.save(post);
+        logger.info("Post deleted successfully.");
     }
 
     // method for restoring soft-deleted posts
@@ -168,6 +185,7 @@ public class PostServiceImpl implements PostService {
 
         // Only allow to delete if the user is the author or has admin role
         if (!currentUser.getRole().equals(Role.ADMIN)) {
+            getWarn(currentUser);
             throw new BadCredentialsException("You are not authorized to delete this post");
         }
 
@@ -196,6 +214,11 @@ public class PostServiceImpl implements PostService {
         responseDTO.setAuthor(authorDTO);
 
         return responseDTO;
+    }
+
+    private void getWarn(User currentUser) {
+        logger.warn("Unauthorized access attempt by user ID: {}, Role: {}",
+                currentUser.getId(), currentUser.getRole());
     }
 
 }

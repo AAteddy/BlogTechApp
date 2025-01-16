@@ -29,9 +29,9 @@ spring:
   cache:
     type: redis
 
-logging:
-  level:
-    org:
-      springframework: INFO
-    com:
-      tedsaasfaha: DEBUG
+#logging:
+#  level:
+#    org:
+#      springframework: INFO
+#    com:
+#      tedsaasfaha: DEBUG
