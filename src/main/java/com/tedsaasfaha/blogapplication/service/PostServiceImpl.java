@@ -125,7 +125,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @CacheEvict(value = {"publishedPosts", "postById"}, key = "#postId", condition = "#newStatus == 'PUBLISHED'", allEntries = true)
+    @CacheEvict(value = {"publishedPosts", "postById"}, key = "#postId", allEntries = true)
     public PostResponseDTO updatePostStatus(Long postId, PostStatus newStatus, User currentUser) {
         logger.info("Updating status of post with ID: {} to {}", postId, newStatus);
         Post post = postRepo.findById(postId)

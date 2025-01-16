@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +28,7 @@ public class PostCleanupService {
         this.postRepo = postRepo;
     }
 
+    @Transactional
     @Scheduled(cron = "0 0 2 * * ?") // Run daily at 2:00 AM
     public void deleteOldDeletedPosts() {
         logger.info("Starting scheduled job to clean up soft-deleted posts.");
@@ -39,8 +41,12 @@ public class PostCleanupService {
 
         if (!postsToDelete.isEmpty()) {
             logger.info("Found {} posts eligible for hard deletion.", postsToDelete.size());
-            postRepo.deleteAll(postsToDelete);
-            logger.info("Successfully deleted {} posts.", postsToDelete.size());
+            try {
+                postRepo.deleteAll(postsToDelete);
+                logger.info("Successfully deleted {} posts.", postsToDelete.size());
+            } catch (Exception e) {
+                logger.error("Error occurred during scheduled post cleanup: {}", e.getMessage());
+            }
         } else {
             logger.info("No posts found for hard deletion.");
         }
