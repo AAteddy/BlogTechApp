@@ -35,6 +35,8 @@ public interface PostService {
 
     Page<PostResponseDTO> filterPostsByStatus(PostStatus status, Pageable pageable);
 
+    Page<PostResponseDTO> filterPostsByAuthor(Long authorId, Pageable pageable);
+
 
 
 }
