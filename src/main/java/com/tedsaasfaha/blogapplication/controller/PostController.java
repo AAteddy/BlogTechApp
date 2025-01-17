@@ -13,12 +13,16 @@ import com.tedsaasfaha.blogapplication.service.PostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -155,5 +159,41 @@ public class PostController {
 
         return ResponseEntity.ok("Post restored successfully");
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<PostResponseDTO>> searchPosts(
+            @RequestParam String keyword,
+            @RequestParam int page,
+            @RequestParam int size,
+            @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
+
+        if (customUserPrinciple == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return ResponseEntity.ok(postService.searchPosts(keyword, pageable));
+    }
+
+    @GetMapping("/filter")
+        public ResponseEntity<Page<PostResponseDTO>> filterPosts(
+                @RequestParam(required = false) PostStatus status,
+                @RequestParam(required = false) Long authorId,
+                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime startDate,
+                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+                @RequestParam int page,
+                @RequestParam int size,
+                @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
+
+        if (customUserPrinciple == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return ResponseEntity.ok(
+                postService.searchAndFilterPosts(null,status, authorId, startDate, endDate, pageable)
+        );
+        }
+
 }
 //
