@@ -39,7 +39,8 @@ public interface PostService {
 
     Page<PostResponseDTO> filterPostsByDateRange(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
 
-
+    Page<PostResponseDTO> searchAndFilterPosts(String keyword, PostStatus status, Long authorId,
+                                               LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
 
 }
 //
