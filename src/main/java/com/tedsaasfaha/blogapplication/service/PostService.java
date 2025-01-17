@@ -37,6 +37,8 @@ public interface PostService {
 
     Page<PostResponseDTO> filterPostsByAuthor(Long authorId, Pageable pageable);
 
+    Page<PostResponseDTO> filterPostsByDateRange(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+
 
 
 }

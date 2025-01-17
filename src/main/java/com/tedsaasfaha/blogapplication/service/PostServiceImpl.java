@@ -214,6 +214,14 @@ public class PostServiceImpl implements PostService {
         return authorFilteredPosts.map(this::mapToPostResponseDTO);
     }
 
+    @Override
+    public Page<PostResponseDTO> filterPostsByDateRange(LocalDateTime startDate,
+                                                        LocalDateTime endDate, Pageable pageable) {
+        Page<Post> dateRangeFilteredPosts = postRepo.filterByDateRange(startDate, endDate, pageable);
+
+        return dateRangeFilteredPosts.map(this::mapToPostResponseDTO);
+    }
+
 
     private PostResponseDTO mapToPostResponseDTO(Post post) {
         PostResponseDTO responseDTO = new PostResponseDTO();
