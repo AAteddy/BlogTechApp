@@ -26,6 +26,10 @@ spring:
   cache:
     type: redis
 
+post:
+  retention:
+    period: 1 # Retention period in days
+
 #logging:
 #  level:
 #    org:
