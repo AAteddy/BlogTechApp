@@ -33,6 +33,22 @@ post:
   retention:
     period: 30 # Retention period in days
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+  health:
+    redis:
+      enabled: true
+    db:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+
 #logging:
 #  level:
 #    org:
