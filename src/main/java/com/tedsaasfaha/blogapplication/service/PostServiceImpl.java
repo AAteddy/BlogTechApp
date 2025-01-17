@@ -200,6 +200,13 @@ public class PostServiceImpl implements PostService {
         return searchedPosts.map(this::mapToPostResponseDTO);
     }
 
+    @Override
+    public Page<PostResponseDTO> filterPostsByStatus(PostStatus status, Pageable pageable) {
+        Page<Post> statusFilteredPosts = postRepo.filterByStatus(status, pageable);
+
+        return statusFilteredPosts.map(this::mapToPostResponseDTO);
+    }
+
 
     private PostResponseDTO mapToPostResponseDTO(Post post) {
         PostResponseDTO responseDTO = new PostResponseDTO();

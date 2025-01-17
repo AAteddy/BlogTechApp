@@ -33,6 +33,8 @@ public interface PostService {
 
     Page<PostResponseDTO> searchPosts(String keyword, Pageable pageable);
 
+    Page<PostResponseDTO> filterPostsByStatus(PostStatus status, Pageable pageable);
+
 
 
 }
