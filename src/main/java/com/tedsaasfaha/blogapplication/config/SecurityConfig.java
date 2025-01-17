@@ -41,7 +41,8 @@ public class SecurityConfig {
                                 "/api/auth/refresh-token",
                                 "/swagger-ui/**",      // Allow Swagger UI resources
                                 "/v3/api-docs/**",     // Allow OpenAPI documentation
-                                "/swagger-ui.html"     // Allow Swagger UI entry point
+                                "/swagger-ui.html",    // Allow Swagger UI entry point
+                                "/actuator/prometheus"
                         ).permitAll()
 //                        .requestMatchers(HttpMethod.DELETE, "/api/posts/**").hasRole("ADMIN")
 //                        .requestMatchers(HttpMethod.POST, "/api/posts").hasAnyRole("WRITER", "ADMIN")

@@ -30,7 +30,23 @@ post:
   retention:
     period: 1 # Retention period in days
 
-#logging:
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+  health:
+    redis:
+      enabled: true
+    db:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+
+  #logging:
 #  level:
 #    org:
 #      springframework:
