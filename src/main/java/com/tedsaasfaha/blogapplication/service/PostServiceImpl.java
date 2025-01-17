@@ -193,6 +193,14 @@ public class PostServiceImpl implements PostService {
         postRepo.save(post);
     }
 
+    @Override
+    public Page<PostResponseDTO> searchPosts(String keyword, Pageable pageable) {
+        Page<Post> searchedPosts = postRepo.searchByKeyword(keyword, pageable);
+
+        return searchedPosts.map(this::mapToPostResponseDTO);
+    }
+
+
     private PostResponseDTO mapToPostResponseDTO(Post post) {
         PostResponseDTO responseDTO = new PostResponseDTO();
         responseDTO.setId(post.getId());
