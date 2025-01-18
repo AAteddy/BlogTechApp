@@ -210,5 +210,36 @@ public class PostController {
         return ResponseEntity.ok(postService.filterPostsByStatus(status, pageable));
     }
 
+    @GetMapping("/filter-date")
+    public ResponseEntity<Page<PostResponseDTO>> filterPostsByDate(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            @RequestParam int page,
+            @RequestParam int size,
+            @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
+
+        if (customUserPrinciple == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return ResponseEntity.ok(postService.filterPostsByDateRange(startDate, endDate, pageable));
+    }
+
+    @GetMapping("/filter-author")
+    public ResponseEntity<Page<PostResponseDTO>> filterPostsByAuthor(
+            @RequestParam Long authorId,
+            @RequestParam int page,
+            @RequestParam int size,
+            @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
+
+        if (customUserPrinciple == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return ResponseEntity.ok(postService.filterPostsByAuthor(authorId, pageable));
+    }
+
 }
 //
