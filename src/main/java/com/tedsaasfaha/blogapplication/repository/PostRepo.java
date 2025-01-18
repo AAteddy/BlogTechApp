@@ -28,7 +28,7 @@ public interface PostRepo extends JpaRepository<Post, Long> {
     Page<Post> findByAuthor(User author, Pageable pageable);
 
     @Query("SELECT p FROM Post p WHERE p.isDeleted = true AND p.deletedAt <= :thresholdDate")
-    List<Post> findPostsForHardDeletion(@Param("thresholdDate") LocalDateTime thresholdDate);
+    List<Post> findPostsForHardDeletion(LocalDateTime thresholdDate);
 
     // Search by title or content (case-insensitive)
     @Query("SELECT p FROM Post p WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) " +

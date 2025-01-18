@@ -22,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @RestController
@@ -177,10 +178,11 @@ public class PostController {
 
     @GetMapping("/filter")
         public ResponseEntity<Page<PostResponseDTO>> filterPosts(
+                @RequestParam(required = false) String keyword,
                 @RequestParam(required = false) PostStatus status,
                 @RequestParam(required = false) Long authorId,
-                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime startDate,
-                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+                @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
                 @RequestParam int page,
                 @RequestParam int size,
                 @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
@@ -188,11 +190,14 @@ public class PostController {
         if (customUserPrinciple == null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
         Pageable pageable = PageRequest.of(page, size);
 
         return ResponseEntity.ok(
                 postService.searchAndFilterPosts(
-                        null, status, authorId, startDate, endDate, pageable));
+                        keyword, status, authorId, startDateTime, endDateTime, pageable));
         }
 
     @GetMapping("/filter-status")
@@ -212,8 +217,8 @@ public class PostController {
 
     @GetMapping("/filter-date")
     public ResponseEntity<Page<PostResponseDTO>> filterPostsByDate(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
             @RequestParam int page,
             @RequestParam int size,
             @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
@@ -221,9 +226,14 @@ public class PostController {
         if (customUserPrinciple == null)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
         Pageable pageable = PageRequest.of(page, size);
 
-        return ResponseEntity.ok(postService.filterPostsByDateRange(startDate, endDate, pageable));
+        return ResponseEntity.ok(
+                postService.filterPostsByDateRange(
+                        startDateTime, endDateTime, pageable));
     }
 
     @GetMapping("/filter-author")
