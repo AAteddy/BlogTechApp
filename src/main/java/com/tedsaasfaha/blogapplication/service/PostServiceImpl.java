@@ -10,6 +10,7 @@ import com.tedsaasfaha.blogapplication.entity.Role;
 import com.tedsaasfaha.blogapplication.entity.User;
 import com.tedsaasfaha.blogapplication.exception.PostNotFoundException;
 import com.tedsaasfaha.blogapplication.repository.PostRepo;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -61,8 +62,19 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @Cacheable(value = "publishedPosts", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
+    @Cacheable(value = "publishedPosts", key = "#pageable.pageNumber + '-' + #pageable.pageSize", unless = "#result == null")
+    @Retry(name = "redisFallback", fallbackMethod = "fallbackGetAllPublishedPosts")
     public Page<PostResponseDTO> getAllPublishedPosts(Pageable pageable) {
+        Page<Post> posts = postRepo.findByStatus(PostStatus.PUBLISHED, pageable);
+
+        return posts.map(this::mapToPostResponseDTO);
+    }
+
+    // Method will be called when redis server is not available
+    public Page<PostResponseDTO> fallbackGetAllPublishedPosts(Pageable pageable, Exception ex) {
+        logger.warn("Fallback triggered due to Redis error: {}", ex.getMessage());
+
+        // Fetch from the database
         Page<Post> posts = postRepo.findByStatus(PostStatus.PUBLISHED, pageable);
 
         return posts.map(this::mapToPostResponseDTO);
