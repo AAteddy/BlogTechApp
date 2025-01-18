@@ -8,6 +8,8 @@ import com.tedsaasfaha.blogapplication.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
+
 public interface PostService {
 
     PostResponseDTO createPost(PostCreationRequestDTO postCreationRequestDTO,
@@ -28,5 +30,17 @@ public interface PostService {
     void deletePost(Long postId, User currentUser);
 
     void restorePost(Long postId, User currentUser);
+
+    Page<PostResponseDTO> searchPosts(String keyword, Pageable pageable);
+
+    Page<PostResponseDTO> filterPostsByStatus(PostStatus status, Pageable pageable);
+
+    Page<PostResponseDTO> filterPostsByAuthor(Long authorId, Pageable pageable);
+
+    Page<PostResponseDTO> filterPostsByDateRange(LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+
+    Page<PostResponseDTO> searchAndFilterPosts(String keyword, PostStatus status, Long authorId,
+                                               LocalDateTime startDate, LocalDateTime endDate, Pageable pageable);
+
 }
 //

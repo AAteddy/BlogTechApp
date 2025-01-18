@@ -193,6 +193,46 @@ public class PostServiceImpl implements PostService {
         postRepo.save(post);
     }
 
+    @Override
+    public Page<PostResponseDTO> searchPosts(String keyword, Pageable pageable) {
+        Page<Post> searchedPosts = postRepo.searchByKeyword(keyword, pageable);
+
+        return searchedPosts.map(this::mapToPostResponseDTO);
+    }
+
+    @Override
+    public Page<PostResponseDTO> filterPostsByStatus(PostStatus status, Pageable pageable) {
+        Page<Post> statusFilteredPosts = postRepo.findByStatus(status, pageable);
+
+        return statusFilteredPosts.map(this::mapToPostResponseDTO);
+    }
+
+    @Override
+    public Page<PostResponseDTO> filterPostsByAuthor(Long authorId, Pageable pageable) {
+        Page<Post> authorFilteredPosts = postRepo.filterByAuthor(authorId, pageable);
+
+        return authorFilteredPosts.map(this::mapToPostResponseDTO);
+    }
+
+    @Override
+    public Page<PostResponseDTO> filterPostsByDateRange(LocalDateTime startDate,
+                                                        LocalDateTime endDate, Pageable pageable) {
+        Page<Post> dateRangeFilteredPosts = postRepo.filterByDateRange(startDate, endDate, pageable);
+
+        return dateRangeFilteredPosts.map(this::mapToPostResponseDTO);
+    }
+
+    @Override
+    public Page<PostResponseDTO> searchAndFilterPosts(String keyword, PostStatus status,
+                                                      Long authorId, LocalDateTime startDate,
+                                                      LocalDateTime endDate, Pageable pageable) {
+
+        Page<Post> searchedAndFilteredPosts = postRepo.searchAndFilter(keyword, status, authorId, startDate, endDate, pageable);
+
+        return searchedAndFilteredPosts.map(this::mapToPostResponseDTO);
+    }
+
+
     private PostResponseDTO mapToPostResponseDTO(Post post) {
         PostResponseDTO responseDTO = new PostResponseDTO();
         responseDTO.setId(post.getId());

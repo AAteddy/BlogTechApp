@@ -13,12 +13,17 @@ import com.tedsaasfaha.blogapplication.service.PostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -155,5 +160,96 @@ public class PostController {
 
         return ResponseEntity.ok("Post restored successfully");
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<PostResponseDTO>> searchPosts(
+            @RequestParam String keyword,
+            @RequestParam int page,
+            @RequestParam int size,
+            @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
+
+        if (customUserPrinciple == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return ResponseEntity.ok(postService.searchPosts(keyword, pageable));
+    }
+
+    @GetMapping("/filter")
+        public ResponseEntity<Page<PostResponseDTO>> filterPosts(
+                @RequestParam(required = false) String keyword,
+                @RequestParam(required = false) PostStatus status,
+                @RequestParam(required = false) Long authorId,
+                @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+                @RequestParam int page,
+                @RequestParam int size,
+                @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
+
+        if (customUserPrinciple == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return ResponseEntity.ok(
+                postService.searchAndFilterPosts(
+                        keyword, status, authorId, startDateTime, endDateTime, pageable));
+        }
+
+    @GetMapping("/filter-status")
+    public ResponseEntity<Page<PostResponseDTO>> filterPostsByStatus(
+            @RequestParam PostStatus status,
+            @RequestParam int page,
+            @RequestParam int size,
+            @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
+
+        if (customUserPrinciple == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return ResponseEntity.ok(postService.filterPostsByStatus(status, pageable));
+    }
+
+    @GetMapping("/filter-date")
+    public ResponseEntity<Page<PostResponseDTO>> filterPostsByDate(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+            @RequestParam int page,
+            @RequestParam int size,
+            @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
+
+        if (customUserPrinciple == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return ResponseEntity.ok(
+                postService.filterPostsByDateRange(
+                        startDateTime, endDateTime, pageable));
+    }
+
+    @GetMapping("/filter-author")
+    public ResponseEntity<Page<PostResponseDTO>> filterPostsByAuthor(
+            @RequestParam Long authorId,
+            @RequestParam int page,
+            @RequestParam int size,
+            @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
+
+        if (customUserPrinciple == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return ResponseEntity.ok(postService.filterPostsByAuthor(authorId, pageable));
+    }
+
 }
 //
