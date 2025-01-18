@@ -8,6 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -29,5 +32,18 @@ public class RedisCacheConfig {
                 .cacheDefaults(config)
                 .build();
     }
+
+    // Redis configuration to handle Timeouts
+    @Bean
+    public LettuceConnectionFactory redisConnectionFactory() {
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("localhost", 6379);
+        LettuceClientConfiguration clientConfig = LettuceClientConfiguration
+                .builder()
+                .commandTimeout(Duration.ofSeconds(2))
+                .build();
+
+        return new LettuceConnectionFactory(config, clientConfig);
+    }
+
 }
 //
