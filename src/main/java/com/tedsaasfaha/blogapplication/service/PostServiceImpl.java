@@ -202,7 +202,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<PostResponseDTO> filterPostsByStatus(PostStatus status, Pageable pageable) {
-        Page<Post> statusFilteredPosts = postRepo.filterByStatus(status, pageable);
+        Page<Post> statusFilteredPosts = postRepo.findByStatus(status, pageable);
 
         return statusFilteredPosts.map(this::mapToPostResponseDTO);
     }

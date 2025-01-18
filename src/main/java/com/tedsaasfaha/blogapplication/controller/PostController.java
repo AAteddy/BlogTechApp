@@ -191,9 +191,24 @@ public class PostController {
         Pageable pageable = PageRequest.of(page, size);
 
         return ResponseEntity.ok(
-                postService.searchAndFilterPosts(null,status, authorId, startDate, endDate, pageable)
-        );
+                postService.searchAndFilterPosts(
+                        null, status, authorId, startDate, endDate, pageable));
         }
+
+    @GetMapping("/filter-status")
+    public ResponseEntity<Page<PostResponseDTO>> filterPostsByStatus(
+            @RequestParam PostStatus status,
+            @RequestParam int page,
+            @RequestParam int size,
+            @AuthenticationPrincipal CustomUserPrinciple customUserPrinciple) {
+
+        if (customUserPrinciple == null)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return ResponseEntity.ok(postService.filterPostsByStatus(status, pageable));
+    }
 
 }
 //
