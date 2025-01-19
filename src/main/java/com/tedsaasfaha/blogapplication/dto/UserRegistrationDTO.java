@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class UserRegistrationDTO {
 
@@ -23,5 +25,12 @@ public class UserRegistrationDTO {
 
     @NotBlank(message = "Role is required")
     private String role;
+
+    public void setRole(String role) {
+        if (List.of("READER", "WRITER", "ADMIN").contains(role.toUpperCase())) {
+            throw new IllegalArgumentException("Invalid role provided.");
+        }
+        this.role = role;
+    }
 }
 //
