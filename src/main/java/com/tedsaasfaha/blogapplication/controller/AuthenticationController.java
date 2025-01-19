@@ -40,6 +40,13 @@ public class AuthenticationController {
             @RequestBody UserRegistrationDTO registrationDTO
             ) {
 
+        // Ensure the role is not ADMIN; only READER or WRITER are allowed
+        if (registrationDTO.getRole() != null &&
+                registrationDTO.getRole().equalsIgnoreCase("ADMIN")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("You are not authorized to create users with the ADMIN role.");
+        }
+
         User user = new User();
         user.setName(registrationDTO.getName());
         user.setEmail(registrationDTO.getEmail());
