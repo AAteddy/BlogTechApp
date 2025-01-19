@@ -5,7 +5,6 @@ package com.tedsaasfaha.blogapplication.config;
 import com.tedsaasfaha.blogapplication.exception.CustomAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -44,13 +43,6 @@ public class SecurityConfig {
                                 "/swagger-ui.html",    // Allow Swagger UI entry point
                                 "/actuator/prometheus" // Allow expose Prometheus metrics
                         ).permitAll()
-//                        .requestMatchers(HttpMethod.DELETE, "/api/posts/**").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.POST, "/api/posts").hasAnyRole("WRITER", "ADMIN")
-//                        .requestMatchers(HttpMethod.PUT, "/api/posts/**").hasAnyRole("WRITER", "ADMIN")
-//                        .requestMatchers(HttpMethod.GET, "/api/posts/**").hasAnyRole("READER", "WRITER", "ADMIN")
-//                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-//                        .requestMatchers("/api/writer/**").hasRole("WRITER")
-//                        .requestMatchers("/api/reader/**").hasAnyRole("READER", "WRITER", "ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception
                 .authenticationEntryPoint(customAuthenticationEntryPoint)) // Set custom entry point
@@ -78,3 +70,12 @@ public class SecurityConfig {
 //
 //
 //
+
+
+//                        .requestMatchers(HttpMethod.DELETE, "/api/posts/**").hasRole("ADMIN")
+//                        .requestMatchers(HttpMethod.POST, "/api/posts").hasAnyRole("WRITER", "ADMIN")
+//                        .requestMatchers(HttpMethod.PUT, "/api/posts/**").hasAnyRole("WRITER", "ADMIN")
+//                        .requestMatchers(HttpMethod.GET, "/api/posts/**").hasAnyRole("READER", "WRITER", "ADMIN")
+//                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+//                        .requestMatchers("/api/writer/**").hasRole("WRITER")
+//                        .requestMatchers("/api/reader/**").hasAnyRole("READER", "WRITER", "ADMIN")
