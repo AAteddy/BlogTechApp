@@ -1,7 +1,7 @@
 package com.tedsaasfaha.blogapplication.controller;
 
 
-import com.tedsaasfaha.blogapplication.dto.UserRegistrationDTO;
+import com.tedsaasfaha.blogapplication.dto.AdminRegistrationDTO;
 import com.tedsaasfaha.blogapplication.entity.Role;
 import com.tedsaasfaha.blogapplication.entity.User;
 import com.tedsaasfaha.blogapplication.service.UserService;
@@ -27,24 +27,19 @@ public class AdminController {
     /**
      * Endpoint to create an ADMIN user. Only accessible by an existing ADMIN.
      */
-    @PostMapping("/create")
+    @PostMapping("/register-admin")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<String> createAdmin(
-            @Validated @RequestBody UserRegistrationDTO registrationDTO) {
+    public ResponseEntity<String> registerAdmin(
+            @Validated @RequestBody AdminRegistrationDTO registrationDTO) {
 
-        if (!"ADMIN".equalsIgnoreCase(registrationDTO.getRole())) {
-            return new ResponseEntity<>(
-                    "Only ADMIN role can be created via this endpoint.",
-                    HttpStatus.BAD_REQUEST);
-        }
 
-        User user = new User();
-        user.setName(registrationDTO.getName());
-        user.setEmail(registrationDTO.getEmail());
-        user.setPassword(registrationDTO.getPassword());
-        user.setRole(Role.ADMIN);
+        User adminUser = new User();
+        adminUser.setName(registrationDTO.getName());
+        adminUser.setEmail(registrationDTO.getEmail());
+        adminUser.setPassword(registrationDTO.getPassword());
+        adminUser.setRole(Role.ADMIN);
 
-        userService.registerUser(user);
+        userService.registerUser(adminUser);
 
         return new ResponseEntity<>(
                 "Admin user created successfully",
