@@ -1,3 +1,4 @@
+
 package com.tedsaasfaha.blogapplication.controller;
 
 
@@ -27,8 +28,8 @@ public class AdminController {
     /**
      * Endpoint to create an ADMIN user. Only accessible by an existing ADMIN.
      */
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping("/register-admin")
-    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> registerAdmin(
             @Validated @RequestBody AdminRegistrationDTO registrationDTO) {
 
@@ -46,3 +47,4 @@ public class AdminController {
                 HttpStatus.CREATED);
     }
 }
+//
