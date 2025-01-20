@@ -48,6 +48,10 @@ public class UserService {
         return userRepo.findByEmail(email).orElse(null);
     }
 
+    public User findUserById(Long userId) {
+        return userRepo.findById(userId).orElse(null);
+    }
+
     public boolean validatePassword(String rawPassword,
                                     String encodePassword) {
         return passwordEncoder.matches(rawPassword,encodePassword);
