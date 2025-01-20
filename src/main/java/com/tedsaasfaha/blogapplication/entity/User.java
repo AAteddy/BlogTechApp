@@ -41,7 +41,7 @@ public class User {
 
     // Method to get authorities for Spring Security
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     // Method to indicate if the user is enabled

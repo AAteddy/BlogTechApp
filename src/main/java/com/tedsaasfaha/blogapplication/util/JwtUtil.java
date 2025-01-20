@@ -21,7 +21,7 @@ public class JwtUtil {
     public String generateAccessToken(String username, String role) {
         return Jwts.builder()
                 .subject(username)
-                .claim("role", role)
+                .claim("role", "ROLE_" + role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + JwtConstant.ACCESS_TOKEN_VALIDITY))
                 .signWith(key) // Specify algorithm explicitly
@@ -32,7 +32,7 @@ public class JwtUtil {
     public String generateRefreshToken(String username, String role) {
         return Jwts.builder()
                 .subject(username)
-                .claim("role", role)
+                .claim("role", "ROLE_" + role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + JwtConstant.REFRESH_TOKEN_VALIDITY))
                 .signWith(key)
