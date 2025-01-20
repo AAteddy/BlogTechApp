@@ -43,6 +43,7 @@ public class SecurityConfig {
                                 "/swagger-ui.html",    // Allow Swagger UI entry point
                                 "/actuator/prometheus" // Allow expose Prometheus metrics
                         ).permitAll()
+                        .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception
                 .authenticationEntryPoint(customAuthenticationEntryPoint)) // Set custom entry point

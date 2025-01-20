@@ -32,8 +32,12 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
+    public boolean userExist(String email) {
+        return userRepo.findByEmail(email).isPresent();
+    }
+
     public TokenDTO login(UserLoginDTO loginDTO) {
-        User user = userRepo.findByEmail(loginDTO.getEmail())
+        User user = userRepo.findByEmail(loginDTO.getEmail().toLowerCase())
                 .orElseThrow(() -> new BadCredentialsException(
                         "Invalid email or password"));
 
