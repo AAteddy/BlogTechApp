@@ -2,16 +2,13 @@
 package com.tedsaasfaha.blogapplication.dto;
 
 
-import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-public class UserRegistrationDTO {
+public class AdminRegistrationDTO {
 
     @NotBlank(message = "Name is required")
     private String name;
@@ -23,15 +20,5 @@ public class UserRegistrationDTO {
     @NotBlank(message = "Password is required")
     @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password;
-
-    @Nullable
-    private String role;
-
-    public void setRole(String role) {
-        if (!List.of("READER", "WRITER", "ADMIN").contains(role.toUpperCase())) {
-            throw new IllegalArgumentException("Invalid role provided.");
-        }
-        this.role = role.toUpperCase();
-    }
 }
 //
