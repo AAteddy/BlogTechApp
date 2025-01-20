@@ -48,14 +48,14 @@ public class AuthenticationController {
                     .body("You are not authorized to create users with the ADMIN role.");
         }
 
-        if ( authService.userExist(registrationDTO.getEmail()) ) {
+        if ( authService.userExist(registrationDTO.getEmail().toLowerCase()) ) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("User with the email already exist.");
         }
 
         User user = new User();
         user.setName(registrationDTO.getName());
-        user.setEmail(registrationDTO.getEmail()); // Normalize email
+        user.setEmail(registrationDTO.getEmail().toLowerCase()); // Normalize email
         user.setPassword(registrationDTO.getPassword());
         user.setRole(registrationDTO.getRole() != null ?
                 Role.valueOf(registrationDTO.getRole().toUpperCase()) :
